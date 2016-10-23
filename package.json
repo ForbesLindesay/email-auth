@@ -1,6 +1,6 @@
 {
   "name": "email-auth",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "description": "Email verification for login",
   "keywords": [],
@@ -11,7 +11,8 @@
     "babel-runtime": "^6.3.19",
     "ms": "^0.7.1",
     "postmark": "^1.2.1",
-    "promise": "^7.1.1"
+    "promise": "^7.1.1",
+    "qs": "^6.3.0"
   },
   "devDependencies": {
     "babel-cli": "*",

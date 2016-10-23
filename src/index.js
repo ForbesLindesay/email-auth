@@ -3,6 +3,7 @@ import Promise from 'promise';
 import ms from 'ms';
 import generateToken from './generate-token';
 import sendPostmarkEmail from './send-postmark-email';
+import handleQs from './handle-qs';
 
 function id(v) {
   return v;
@@ -123,11 +124,7 @@ module.exports = function createClient({
 
         const expiry = Date.now() + ms('1 day');
         return Promise.resolve(saveToken({email, token, expiry})).then(id => {
-          const url = (
-            redirectURL +
-            (redirectURL.indexOf('?') === -1 ? '?' : '&') +
-            'id=' + encodeURIComponent(id) + '&token=' + encodeURIComponent(token)
-          );
+          const url = handleQs(redirectURL, {id, token});
           if (developmentMode) {
             console.log('link to log in:');
             console.log(url);
