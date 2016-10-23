@@ -129,7 +129,7 @@ module.exports = function createClient({
   }
   return {
     sendMessage(email, redirectURL) {
-      generateUrl(email, redirectURL).then(url => {
+      return generateUrl(email, redirectURL).then(url => {
         if (developmentMode) {
           console.log('link to log in:');
           console.log(url);
