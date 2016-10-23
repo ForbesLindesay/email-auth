@@ -1,0 +1,39 @@
+{
+  "name": "email-auth",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "description": "Email verification for login",
+  "keywords": [],
+  "files": [
+    "lib/"
+  ],
+  "dependencies": {
+    "babel-runtime": "^6.3.19",
+    "ms": "^0.7.1",
+    "postmark": "^1.2.1",
+    "promise": "^7.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "*",
+    "babel-preset-forbeslindesay": "*",
+    "eslint": "*",
+    "eslint-config-forbeslindesay": "*",
+    "jest": "^16.0.1",
+    "testit": "*"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "babel src --out-dir lib",
+    "lint": "eslint src",
+    "test": "jest --coverage && npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ForbesLindesay/email-auth.git"
+  },
+  "author": {
+    "name": "Forbes Lindesay",
+    "url": "http://github.com/ForbesLindesay"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,10 @@
+exports[`test sends the email 1`] = `
+Object {
+  "fromAddress": undefined,
+  "htmlBody": undefined,
+  "subject": undefined,
+  "toAddress": "forbes@lindesay.co.uk",
+  "txtBody": undefined,
+  "url": "https://www.example.com/destination?id=0&token=MOCK_TOKEN",
+}
+`;
