@@ -3,7 +3,7 @@ import Promise from 'promise';
 import ms from 'ms';
 import generateToken from './generate-token';
 import sendPostmarkEmail from './send-postmark-email';
-import handleQs from './handle-qs';
+import handleQs, {removeFields} from './handle-qs';
 
 function id(v) {
   return v;
@@ -103,52 +103,56 @@ module.exports = function createClient({
     fromAddress = variables => fromAddressSrc.replace(/\{\{([a-zA-Z0-9.]+)\}\}/g, (_, key) => variables[key]);
   }
 
+  function generateUrl(email, redirectURL) {
+    if (!isEmail(email)) {
+      return Promise.reject(new Error('You must provide a valid email address'));
+    }
+    if (!redirectURL || typeof redirectURL !== 'string') {
+      return Promise.reject(new Error('You must provide a redirectURL'));
+    }
+    return Promise.all([
+      getUserByEmail(email),
+      generateToken(),
+    ]).then(([user, token]) => {
+      if (!user) {
+        const err = new Error('Access Denied');
+        err.code = 'INVALID_EMAIL';
+        err.status = err.statusCode = 403;
+        throw err;
+      }
+
+      const expiry = Date.now() + ms('1 day');
+      return Promise.resolve(saveToken({email, token, expiry})).then(id => {
+        return handleQs(redirectURL, {id, token});
+      });
+    });
+  }
   return {
     sendMessage(email, redirectURL) {
-      if (!isEmail(email)) {
-        return Promise.reject(new Error('You must provide a valid email address'));
-      }
-      if (!redirectURL || typeof redirectURL !== 'string') {
-        return Promise.reject(new Error('You must provide a redirectURL'));
-      }
-      return Promise.all([
-        getUserByEmail(email),
-        generateToken(),
-      ]).then(([user, token]) => {
-        if (!user) {
-          const err = new Error('Access Denied');
-          err.code = 'INVALID_EMAIL';
-          err.status = err.statusCode = 403;
-          throw err;
+      generateUrl(email, redirectURL).then(url => {
+        if (developmentMode) {
+          console.log('link to log in:');
+          console.log(url);
+          return {
+            emailSent: false,
+            development: true,
+            path: url,
+          };
+        } else {
+          const allVariables = {
+            ...variables,
+            toAddress: email,
+            url,
+          };
+          allVariables.fromAddress = fromAddress ? fromAddress(allVariables) : undefined;
+          allVariables.subject = subject ? subject(allVariables) : undefined;
+          allVariables.txtBody = txtTemplate ? txtTemplate(allVariables) : undefined;
+          allVariables.htmlBody = htmlTemplate ? htmlTemplate(allVariables) : allVariables.txtBody;
+          return Promise.resolve(sendEmail(allVariables)).then(() => ({
+            emailSent: true,
+            development: false,
+          }));
         }
-
-        const expiry = Date.now() + ms('1 day');
-        return Promise.resolve(saveToken({email, token, expiry})).then(id => {
-          const url = handleQs(redirectURL, {id, token});
-          if (developmentMode) {
-            console.log('link to log in:');
-            console.log(url);
-            return {
-              emailSent: false,
-              development: true,
-              path: url,
-            };
-          } else {
-            const allVariables = {
-              ...variables,
-              toAddress: email,
-              url,
-            };
-            allVariables.fromAddress = fromAddress ? fromAddress(allVariables) : undefined;
-            allVariables.subject = subject ? subject(allVariables) : undefined;
-            allVariables.txtBody = txtTemplate ? txtTemplate(allVariables) : undefined;
-            allVariables.htmlBody = htmlTemplate ? htmlTemplate(allVariables) : allVariables.txtBody;
-            return Promise.resolve(sendEmail(allVariables)).then(() => ({
-              emailSent: true,
-              development: false,
-            }));
-          }
-        });
       });
     },
     verifyToken(id, tokenProvidedByUser) {
@@ -199,5 +203,9 @@ module.exports = function createClient({
         }
       });
     },
+    stripToken(url) {
+      return removeFields(url, ['id', 'token']);
+    },
+    generateUrl,
   };
 };
