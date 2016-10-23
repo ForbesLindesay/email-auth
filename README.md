@@ -42,8 +42,8 @@ client.sendMessage('forbes@lindesay.co.uk', 'https://example.com').done();
 
 // to verify/complete a login
 app.get('/', (req, res, next) => {
-  if (req.query.id && req.query.token) {
-    client.verifyToken(req.query.id, req.query.token).done(email => {
+  if (req.query.token_id && req.query.token) {
+    client.verifyToken(req.query.token_id, req.query.token).done(email => {
       // log the user in
     }, next);
   }

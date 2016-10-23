@@ -122,8 +122,8 @@ module.exports = function createClient({
       }
 
       const expiry = Date.now() + ms('1 day');
-      return Promise.resolve(saveToken({email, token, expiry})).then(id => {
-        return handleQs(redirectURL, {id, token});
+      return Promise.resolve(saveToken({email, token, expiry})).then(token_id => {
+        return handleQs(redirectURL, {token_id, token});
       });
     });
   }
@@ -204,7 +204,7 @@ module.exports = function createClient({
       });
     },
     stripToken(url) {
-      return removeFields(url, ['id', 'token']);
+      return removeFields(url, ['token_id', 'token']);
     },
     generateUrl,
   };
