@@ -5,6 +5,6 @@ Object {
   "subject": undefined,
   "toAddress": "forbes@lindesay.co.uk",
   "txtBody": undefined,
-  "url": "https://www.example.com/destination?id=0&token=MOCK_TOKEN",
+  "url": "https://www.example.com/destination?token_id=0&token=MOCK_TOKEN",
 }
 `;
