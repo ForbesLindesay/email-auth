@@ -19,7 +19,7 @@
     "babel-preset-forbeslindesay": "*",
     "eslint": "*",
     "eslint-config-forbeslindesay": "*",
-    "jest": "^16.0.1",
+    "jest": "^19.0.2",
     "testit": "*"
   },
   "scripts": {
