@@ -1,5 +1,7 @@
 # email-auth
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/email-auth.svg)](https://greenkeeper.io/)
+
 Email verification for login
 
 [![Build Status](https://img.shields.io/travis/ForbesLindesay/email-auth/master.svg)](https://travis-ci.org/ForbesLindesay/email-auth)
