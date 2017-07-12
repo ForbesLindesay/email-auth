@@ -81,12 +81,23 @@ export interface ClientOptions<TTokenID extends number | string, TUser> {
    */
   postmark?: string;
 
+  /**
+   * The time before the token expires.  This should be in a format accepted by the `ms` module
+   * e.g. "1 hour" or "2 days"
+   */
+  expiryDuration?: string;
+
   fromAddress?: Variable;
   subject?: Variable;
   txtTemplate?: Variable;
   htmlTemplate?: Variable;
 }
 export interface ExtraData {
+  /**
+   * The time before the token expires.  This should be in a format accepted by the `ms` module
+   * e.g. "1 hour" or "2 days"
+   */
+  expiryDuration?: string;
   /**
    * The name of the person you are sending the e-mail to.  Note that this must match
    * [A-Za-z ]+ or it will be ignored.
@@ -141,6 +152,7 @@ export default function createClient<TTokenID extends number | string, TUser = '
   subject,
   txtTemplate,
   htmlTemplate,
+  expiryDuration,
 }: ClientOptions<TTokenID, TUser>) {
   if (typeof saveToken !== 'function') {
     throw new Error(
@@ -212,7 +224,7 @@ export default function createClient<TTokenID extends number | string, TUser = '
     fromAddress = variables => fromAddressSrc.replace(/\{\{([a-zA-Z0-9.]+)\}\}/g, (_, key) => variables[key]);
   }
 
-  function generateUrl(email: string, redirectURL: string): Promise<string> {
+  function generateUrl(email: string, redirectURL: string, expiryDuration: string = '1 day'): Promise<string> {
     if (!isEmail(email)) {
       return Promise.reject(new Error('You must provide a valid email address'));
     }
@@ -230,7 +242,16 @@ export default function createClient<TTokenID extends number | string, TUser = '
         throw err;
       }
 
-      const expiry = Date.now() + ms('1 day');
+      const expiryMilliseconds = ms(expiryDuration);
+      if (
+        typeof expiryMilliseconds !== 'number' ||
+        Number.isNaN(expiryMilliseconds) ||
+        expiryMilliseconds > ms('90 days') ||
+        expiryMilliseconds < 1
+      ) {
+        throw new Error('Invalid expiry duration "' + expiryDuration + '"');
+      }
+      const expiry = Date.now() + expiryMilliseconds;
       return Promise.resolve(saveToken({email, value: tokenString, expiry})).then(token_id => {
         return handleQs(redirectURL, {token_id, token_value: tokenString});
       });
@@ -238,7 +259,7 @@ export default function createClient<TTokenID extends number | string, TUser = '
   }
   return {
     sendMessage(email: string, redirectURL: string, data: ExtraData = {}): Promise<SendMessageResult> {
-      return generateUrl(email, redirectURL).then((url): SendMessageResult | Promise<SendMessageResult> => {
+      return generateUrl(email, redirectURL, data.expiryDuration || expiryDuration).then((url): SendMessageResult | Promise<SendMessageResult> => {
         if (developmentMode) {
           console.log('link to log in:');
           console.log(url);
