@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sends the email 1`] = `
+Object {
+  "fromAddress": undefined,
+  "htmlBody": undefined,
+  "subject": undefined,
+  "toAddress": "forbes@lindesay.co.uk",
+  "txtBody": undefined,
+  "url": "https://www.example.com/destination?token_id=0&token_value=MOCK_TOKEN",
+}
+`;

@@ -8,27 +8,54 @@
     "lib/"
   ],
   "dependencies": {
-    "babel-runtime": "^6.3.19",
-    "ms": "^0.7.1",
-    "postmark": "^1.2.1",
-    "promise": "^7.1.1",
-    "qs": "^6.3.0"
+    "@types/ms": "^0.7.29",
+    "@types/node": "^6.0.81",
+    "@types/postmark": "^1.3.0",
+    "@types/qs": "^6.5.0",
+    "ms": "^2.0.0",
+    "postmark": "^1.4.1",
+    "promise": "^8.0.1",
+    "qs": "^6.5.0"
   },
   "devDependencies": {
-    "babel-cli": "*",
-    "babel-preset-forbeslindesay": "*",
-    "eslint": "*",
-    "eslint-config-forbeslindesay": "*",
-    "jest": "^16.0.1",
-    "testit": "*"
+    "@types/jest": "*",
+    "flowgen2": "^2.0.1",
+    "husky": "*",
+    "jest": "*",
+    "lint-staged": "*",
+    "prettier": "*",
+    "rimraf": "^2.6.1",
+    "ts-jest": "*",
+    "typescript": "*"
   },
   "scripts": {
+    "precommit": "lint-staged",
     "prepublish": "npm run build",
-    "build": "babel src --out-dir lib",
-    "lint": "eslint src",
-    "pretest": "rimraf lib",
-    "test": "jest --coverage",
-    "posttest": "npm run lint"
+    "prettier": "prettier --parser typescript --single-quote --trailing-comma all --no-bracket-spacing --write \"src/**/*.js\"",
+    "prettier:check": "prettier --parser typescript --single-quote --trailing-comma all --no-bracket-spacing --list-different \"src/**/*.js\"",
+    "build": "tsc && rimraf lib/__mocks__ lib/__test__ && flowgen \"lib/**/*\"",
+    "test": "jest ./src --coverage",
+    "watch": "jest ./src --coverage --watch"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --parser typescript --single-quote --trailing-comma all --no-bracket-spacing --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": [
+      "**/*.test.(ts|tsx|js)"
+    ]
   },
   "repository": {
     "type": "git",

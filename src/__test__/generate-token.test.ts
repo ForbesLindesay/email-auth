@@ -1,4 +1,4 @@
-import Promise from 'promise';
+import Promise = require('promise');
 import generateToken from '../generate-token';
 
 test('generates a string of n random characters', () => {
